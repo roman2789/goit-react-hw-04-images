@@ -7,24 +7,23 @@ const modalRoot = document.querySelector('#modal-root');
 
 export const Modal = ({ onClose, image }) => {
   const handleBackdropClick = e => {
-    if (e.currentTarget !== e.target) {
-      onClose();
-    }
-  };
-
-  const handleKeyDown = e => {
-    if (e.code === 'Escape') {
+    if (e.currentTarget === e.target) {
       onClose();
     }
   };
 
   useEffect(() => {
+    const handleKeyDown = e => {
+      if (e.code === 'Escape') {
+        onClose();
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [onClose]);
 
   return createPortal(
     <Backdrop onClick={handleBackdropClick}>
