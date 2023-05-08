@@ -62,7 +62,7 @@ export const App = () => {
       <Toaster />
       <Searchbar onSubmit={onSearchFormSubmit} />
       {empty &&
-        toast.error('Нажаль по цьому запиту нічого немає...', {
+        toast.error('Нажаль по цьому запиту нічого немає...(', {
           duration: 2000,
           position: 'top-right',
           id: ' ',
