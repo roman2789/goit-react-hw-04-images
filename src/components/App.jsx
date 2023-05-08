@@ -1,4 +1,3 @@
-import { Component } from 'react';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Container } from './AppStyled';
 import { Searchbar } from './Searchbar/Searchbar';
@@ -7,85 +6,76 @@ import toast, { Toaster } from 'react-hot-toast';
 import { getImages } from 'services/getImageApi';
 import { Loader } from 'components/Loader/Loader';
 import { Button } from 'components/Button/Button';
+import { useState, useEffect } from 'react';
 
-class App extends Component {
-  state = {
-    images: [],
-    query: '',
-    page: 1,
-    loading: false,
-    modalImage: '',
-    total: 1,
-    error: null,
-    empty: false,
-  };
+export const App = () => {
+  const [images, setImages] = useState([]);
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [total, setTotal] = useState(1);
+  const [error, setError] = useState(null);
+  const [empty, setEmpty] = useState(false);
 
-  onSearchFormSubmit = query => {
-    this.setState({
-      query,
-      images: [],
-      page: 1,
-      total: 1,
-      loading: false,
-      error: null,
-      empty: false,
-    });
-  };
-  handleLoadMoreBtn = () => {
-    this.setState(prevState => ({ page: prevState.page + 1 }));
-  };
-
-  async componentDidUpdate(_, PrevState) {
-    if (
-      PrevState.query !== this.state.query ||
-      PrevState.page !== this.state.page
-    ) {
-      this.setState({ loading: true });
-      const { query, page } = this.state;
-
-      try {
-        const data = await getImages(query, page);
-        if (data.hits.length === 0) {
-          this.setState({ empty: true });
-        } else {
-          this.setState(prevState => ({
-            page: prevState.page,
-            images: [...prevState.images, ...data.hits],
-            total: data.total,
-          }));
-        }
-        this.setState({ loading: false });
-      } catch (error) {
-        this.setState({ error });
-        this.setState({ loading: false });
-      }
+  const onSearchFormSubmit = searchQuery => {
+    if (searchQuery === query) {
+      return;
     }
-  }
+    setQuery(searchQuery);
+    setImages([]);
+    setPage(1);
+    setTotal(1);
+    setLoading(false);
+    setError(null);
+    setEmpty(false);
+  };
+  const handleLoadMoreBtn = () => {
+    setPage(prevPage => prevPage + 1);
+  };
 
-  render() {
-    const { images, loading, total, empty, page, error } = this.state;
-    return (
-      <Container>
-        <GlobalStyles />
-        <Toaster />
-        <Searchbar onSubmit={this.onSearchFormSubmit} />
-        {empty &&
-          toast.error('Нажаль по цьому запиту нічого немає...', {
-            duration: 2000,
-            position: 'top-right',
-            id: ' ',
-          })}
+  useEffect(() => {
+    if (!query) {
+      return;
+    }
+    setLoading(true);
+    getImages(query, page)
+      .then(({ hits, total }) => {
+        if (hits.length === 0) {
+          setEmpty(true);
+          return;
+        }
+        setPage(prevPage => prevPage);
+        setImages(prevImages => [...prevImages, ...hits]);
+        setTotal(total);
+        setLoading(false);
+      })
 
-        <ImageGallery images={images} />
+      .catch(error => {
+        setError(error);
+      })
+      .finally(() => setLoading(false));
+  }, [query, page]);
 
-        {error && <>Вибачте, сталася помилка!</>}
-        {loading && <Loader />}
+  return (
+    <Container>
+      <GlobalStyles />
+      <Toaster />
+      <Searchbar onSubmit={onSearchFormSubmit} />
+      {empty &&
+        toast.error('Нажаль по цьому запиту нічого немає...', {
+          duration: 2000,
+          position: 'top-right',
+          id: ' ',
+        })}
 
-        {!loading && images.length > 0 && total / 12 > page && (
-          <Button onClick={this.handleLoadMoreBtn} />
-        )}
-      </Container>
-    );
-  }
-}
-export default App;
+      <ImageGallery images={images} />
+
+      {error && <>Вибачте, сталася помилка!</>}
+      {loading && <Loader />}
+
+      {!loading && images.length > 0 && total / 12 > page && (
+        <Button onClick={handleLoadMoreBtn} />
+      )}
+    </Container>
+  );
+};

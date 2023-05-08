@@ -1,51 +1,50 @@
-import { Component } from 'react';
 import { ImSearch } from 'react-icons/im';
 import { SearchSection, Form, Input, Button } from './SearchbarStyled';
 import toast from 'react-hot-toast';
 import PropTypes from 'prop-types';
+import { useState } from 'react';
 
-export class Searchbar extends Component {
-  state = {
-    query: '',
-  };
-  handleQueryChange = e => {
+export const Searchbar = ({ onSubmit }) => {
+  const [query, setQuery] = useState('');
+
+  const handleQueryChange = e => {
     const queryText = e.currentTarget.value.toLowerCase();
-    this.setState({ query: queryText });
+    setQuery(queryText);
   };
-  onSubmit = e => {
+
+  const onSubmitQuery = e => {
     e.preventDefault();
-    if (this.state.query.trim() === '') {
+    if (query.trim() === '') {
       toast.error('Введіть параметри пошуку!', {
         duration: 2000,
         position: 'top-right',
       });
       return;
     }
-    this.props.onSubmit(this.state.query);
-    this.setState({ query: '' });
+    onSubmit(query);
+    setQuery('');
   };
-  render() {
-    return (
-      <SearchSection>
-        <Form onSubmit={this.onSubmit}>
-          <Button type="submit">
-            <ImSearch style={{ margin: '18px', size: '20px' }} />
-          </Button>
 
-          <Input
-            onChange={this.handleQueryChange}
-            className="input"
-            type="text"
-            autoComplete="on"
-            autoFocus
-            placeholder="Search images and photos"
-            value={this.state.query}
-          />
-        </Form>
-      </SearchSection>
-    );
-  }
-}
+  return (
+    <SearchSection>
+      <Form onSubmit={onSubmitQuery}>
+        <Button type="submit">
+          <ImSearch style={{ margin: '16px', size: '20px' }} />
+        </Button>
+
+        <Input
+          onChange={handleQueryChange}
+          className="input"
+          type="text"
+          autoComplete="on"
+          autoFocus
+          placeholder="Search images and photos"
+          value={query}
+        />
+      </Form>
+    </SearchSection>
+  );
+};
 
 Searchbar.propTypes = {
   onSubmit: PropTypes.func.isRequired,

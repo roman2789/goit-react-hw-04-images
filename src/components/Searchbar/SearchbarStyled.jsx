@@ -39,8 +39,8 @@ export const Input = styled.input`
   font-size: 20px;
   border: none;
   outline: none;
-  padding-left: 4px;
-  padding-right: 4px;
+  padding-left: 6px;
+  padding-right: 6px;
 `;
 
 export const Button = styled.button`
@@ -49,6 +49,7 @@ export const Button = styled.button`
   height: 48px;
   border: 0;
   background-size: 40%;
+  background-color: #d3d3d3;
   background-repeat: no-repeat;
   background-position: center;
   opacity: 0.6;
