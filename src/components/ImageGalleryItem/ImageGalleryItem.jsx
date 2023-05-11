@@ -5,8 +5,8 @@ import PropTypes from 'prop-types';
 
 export const Item = ({ image: { largeImageURL }, children }) => {
   const [showModal, setShowModal] = useState(false);
-  const onToggleModal = e => {
-    setShowModal(!showModal);
+  const onToggleModal = () => {
+    setShowModal(prevShowModal => !prevShowModal);
   };
 
   return (
